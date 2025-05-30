@@ -1,0 +1,148 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Stopwatch</title>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      height: 100vh;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      background: url('https://images.alphacoders.com/654/654716.jpg') no-repeat center center/cover;
+      position: relative;
+    }
+
+    body::before {
+      content: "";
+      position: absolute;
+      inset: 0;
+      background: rgba(0, 0, 0, 0.6); /* Dark overlay */
+      z-index: -1;
+    }
+
+    .stopwatch-container {
+      background-color: #1c1c1c;
+      padding: 30px;
+      border-radius: 15px;
+      text-align: center;
+      color: #ffce00;
+      box-shadow: 0 8px 16px rgba(0, 0, 0, 0.6);
+      position: relative;
+      z-index: 1;
+      width: 450px;
+    }
+
+    .time {
+      font-size: 3em;
+      margin-bottom: 20px;
+      color: #ffffff;
+    }
+
+    .buttons button {
+      padding: 10px 20px;
+      margin: 0 5px;
+      border: none;
+      border-radius: 25px;
+      font-size: 1em;
+      cursor: pointer;
+      color: white;
+      transition: 0.2s;
+    }
+
+    .start { background-color: #28a745; }
+    .start:hover { background-color: #218838; }
+
+    .lap { background-color: #007bff; }
+    .lap:hover { background-color: #0069d9; }
+
+    .reset { background-color: #dc3545; }
+    .reset:hover { background-color: #c82333; }
+
+    .laps {
+      margin-top: 20px;
+      color: #ccc;
+      max-height: 150px;
+      overflow-y: auto;
+      text-align: left;
+    }
+
+    .laps div {
+      margin-bottom: 5px;
+    }
+  </style>
+</head>
+<body>
+  <div class="stopwatch-container">
+    <h2>Stopwatch</h2>
+    <div class="time" id="display">00 : 00 : 00.00</div>
+    <div class="buttons">
+      <button class="start" onclick="startStopwatch()">Start</button>
+      <button class="lap" onclick="recordLap()">Lap</button>
+      <button class="reset" onclick="resetStopwatch()">Reset</button>
+    </div>
+    <div class="laps" id="laps">
+      <strong>Lap Times:</strong>
+    </div>
+  </div>
+
+  <script>
+    let startTime, interval;
+    let elapsed = 0;
+    let running = false;
+
+    function updateDisplay() {
+      const now = Date.now();
+      const time = elapsed + (running ? now - startTime : 0);
+
+      const ms = time % 1000;
+      const s = Math.floor(time / 1000) % 60;
+      const m = Math.floor(time / (1000 * 60)) % 60;
+      const h = Math.floor(time / (1000 * 60 * 60));
+
+      document.getElementById("display").textContent =
+        `${String(h).padStart(2, '0')} : ${String(m).padStart(2, '0')} : ${String(s).padStart(2, '0')}.${String(ms).padStart(2, '0').slice(0,2)}`;
+    }
+
+    function startStopwatch() {
+      if (!running) {
+        startTime = Date.now();
+        interval = setInterval(updateDisplay, 10);
+        running = true;
+        document.querySelector('.start').textContent = "Pause";
+      } else {
+        elapsed += Date.now() - startTime;
+        clearInterval(interval);
+        running = false;
+        document.querySelector('.start').textContent = "Start";
+      }
+    }
+
+    function resetStopwatch() {
+      clearInterval(interval);
+      elapsed = 0;
+      running = false;
+      document.getElementById("display").textContent = "00 : 00 : 00.00";
+      document.getElementById("laps").innerHTML = "<strong>Lap Times:</strong>";
+      document.querySelector('.start').textContent = "Start";
+    }
+
+    function recordLap() {
+      if (!running) return;
+      const lapTime = document.getElementById("display").textContent;
+      const lapList = document.getElementById("laps");
+      const lapEntry = document.createElement("div");
+      lapEntry.textContent = lapTime;
+      lapList.appendChild(lapEntry);
+    }
+  </script>
+</body>
+</html>
